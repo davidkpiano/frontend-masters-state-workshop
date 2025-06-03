@@ -24,6 +24,8 @@ Many developers skip documentation and modeling because they think it takes too 
 - **Improve refactoring**: Well-documented flows make it safe to change implementation details
 - **Reduce technical debt**: Explicit modeling prevents implicit assumptions that become bugs
 
+**Preferred whiteboard**: [tldraw](https://www.tldraw.com/)
+
 ### Three Essential Diagrams
 
 You don't need fancy tools or perfect UML. Simple text representations are often more maintainable than complex visual diagrams because they:
@@ -36,6 +38,8 @@ You don't need fancy tools or perfect UML. Simple text representations are often
 ## Entity Relationship Diagrams (ERD)
 
 Document your data model and relationships between entities.
+
+**Preferred tool**: [DBDiagram](https://dbdiagram.io/)
 
 **Text-based ERD Example:**
 
@@ -83,6 +87,8 @@ Document your data model and relationships between entities.
 
 Document the flow of interactions between different parts of your system.
 
+**Preferred tool**: [Swimlanes](https://swimlanes.io/)
+
 **Text-based Sequence Example:**
 
 ```
@@ -103,6 +109,8 @@ api -> UI: show confirmation
 ## State Diagrams
 
 Document your application's states and what happens in each one. Think about what the user sees, what data you're storing, and what's happening behind the scenes.
+
+**Preferred tool**: [State.new](https://state.new/)
 
 <details>
 <summary>Text-based State Flow Example:</summary>

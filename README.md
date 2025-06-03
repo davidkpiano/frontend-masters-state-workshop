@@ -43,18 +43,18 @@ pnpm test
 
 ## Workshop Schedule & Exercises
 
-- [Exercise: Antipatterns](http://localhost:3000/exercise-antipatterns) - Common state management mistakes
-- [Exercise: Diagrams](http://localhost:3000/exercise-diagrams) - State visualization techniques
-- [Exercise: Finite states](http://localhost:3000/exercise-finite) - Combining state patterns
-- [Exercise: Reducers](http://localhost:3000/exercise-reducer) - Building with `useReducer`
-- [Exercise: Forms](http://localhost:3000/exercise-form) - Form handling
-- [Exercise: URL](http://localhost:3000/exercise-url) - URL state synchronization
-- [Exercise: Fetch](http://localhost:3000/exercise-fetch) - Data fetching patterns
-- [Exercise: Effects](http://localhost:3000/exercise-effects) - Refactoring cascading `useEffect`s
-- [Exercise: Sync](http://localhost:3000/exercise-sync) - Synchronization patterns with `useSyncExternalStore`
-- [Exercise: Test](http://localhost:3000/exercise-test) - Testing state management
-- [Exercise: Normalization](http://localhost:3000/exercise-normalization) - Data normalization
-- [Exercise: Libraries](http://localhost:3000/exercise-libraries) - State management libraries
+- [Exercise: Antipatterns](http://localhost:3000/exercise-antipatterns) [(📃 Code)](./src/app/exercise-antipatterns/page.tsx) - Common React state management mistakes
+- [Exercise: Diagrams](http://localhost:3000/exercise-diagrams) [(📃 Code)](./src/app/exercise-diagrams/readme.md) - State visualization techniques
+- [Exercise: Finite states](http://localhost:3000/exercise-finite) [(📃 Code)](./src/app/exercise-finite/page.tsx) - Combining state patterns
+- [Exercise: Reducers](http://localhost:3000/exercise-reducer) [(📃 Code)](./src/app/exercise-reducer/page.tsx) - Building with `useReducer`
+- [Exercise: Forms](http://localhost:3000/exercise-form) [(📃 Code)](./src/app/exercise-form/page.tsx) - Form handling
+- [Exercise: URL](http://localhost:3000/exercise-url) [(📃 Code)](./src/app/exercise-url/page.tsx) - URL state synchronization
+- [Exercise: Fetch](http://localhost:3000/exercise-fetch) [(📃 Code)](./src/app/exercise-fetch/page.tsx) - Data fetching patterns
+- [Exercise: Libraries](http://localhost:3000/exercise-libraries) [(📃 Code)](./src/app/exercise-libraries/page.tsx) - State management libraries
+- [Exercise: Normalization](http://localhost:3000/exercise-normalization) [(📃 Code)](./src/app/exercise-normalization/page.tsx) - Data normalization
+- [Exercise: Effects](http://localhost:3000/exercise-effects) [(📃 Code)](./src/app/exercise-effects/page.tsx) - Refactoring cascading `useEffect`s
+- [Exercise: Sync](http://localhost:3000/exercise-sync) [(📃 Code)](./src/app/exercise-sync/page.tsx) - Synchronization patterns with `useSyncExternalStore`
+- [Exercise: Test](http://localhost:3000/exercise-test) [(📃 Code)](./src/app/exercise-test/bookingFlow.test.ts) - Testing state management
 
 ## Technologies Used
 
