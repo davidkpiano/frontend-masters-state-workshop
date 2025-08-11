@@ -14,48 +14,14 @@ interface FlightOption {
   duration: string;
 }
 
-type FlightData = {
-  destination: string;
-  departure: string;
-  arrival: string;
-  passengers: number;
-  flightOptions: FlightOption[] | null;
-  error: string | null;
-} & (
-  | {
-      status: 'idle';
-      flightOptions: null;
-    }
-  | {
-      status: 'submitting';
-      flightOptions: null;
-    }
-  | {
-      status: 'error';
-      error: string;
-    }
-  | {
-      status: 'success';
-      flightOptions: FlightOption[];
-    }
-);
-
 function FlightBooking() {
-  const [flightData, setFlightData] = useState<FlightData>({
-    destination: '',
-    departure: '',
-    arrival: '',
-    passengers: 1,
-    status: 'idle',
-    flightOptions: null,
-    error: null,
-  });
-  const { destination, departure, arrival, passengers } = flightData;
-
-  const [status, setStatus] = useState<
-    'idle' | 'submitting' | 'error' | 'success'
-  >('idle');
-  const isSubmitting = status === 'submitting';
+  const [destination, setDestination] = useState('');
+  const [departure, setDeparture] = useState('');
+  const [arrival, setArrival] = useState('');
+  const [passengers, setPassengers] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [flightOptions, setFlightOptions] = useState<FlightOption[]>([]);
   const [isRoundtrip, setIsRoundtrip] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(
@@ -72,14 +38,10 @@ function FlightBooking() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // setStatus('submitting');
-    // setSelectedFlight(null);
-    setFlightData((prev) => ({
-      ...prev,
-      status: 'submitting',
-      flightOptions: null,
-      error: null,
-    }));
+    setIsSubmitting(true);
+    setIsError(false);
+    setIsSuccess(false);
+    setSelectedFlight(null);
 
     try {
       const flights = await getFlightOptions({
@@ -89,25 +51,13 @@ function FlightBooking() {
         passengers,
       });
 
-      // setFlightOptions(flights);
-      // setStatus('success');
-      setFlightData((prev) => ({
-        ...prev,
-        status: 'success',
-        flightOptions: flights,
-      }));
+      setFlightOptions(flights);
+      setIsSuccess(true);
     } catch {
-      setFlightData((prev) => ({
-        ...prev,
-        status: 'error',
-        error:
-          'An error occurred while searching for flights. Please try again.',
-      }));
+      setIsSubmitting(false);
+      setIsError(true);
     }
   };
-
-  const isError = status === 'error';
-  const isSuccess = status === 'success';
 
   const handleFlightSelect = (flight: FlightOption) => {
     setSelectedFlight(flight);
@@ -135,12 +85,7 @@ function FlightBooking() {
             type="text"
             id="destination"
             value={destination}
-            onChange={(e) =>
-              setFlightData((prev) => ({
-                ...prev,
-                destination: e.target.value,
-              }))
-            }
+            onChange={(e) => setDestination(e.target.value)}
             required
           />
         </div>
@@ -153,12 +98,7 @@ function FlightBooking() {
             type="date"
             id="departure"
             value={departure}
-            onChange={(e) =>
-              setFlightData((prev) => ({
-                ...prev,
-                departure: e.target.value,
-              }))
-            }
+            onChange={(e) => setDeparture(e.target.value)}
             required
           />
         </div>
@@ -172,12 +112,7 @@ function FlightBooking() {
               type="date"
               id="arrival"
               value={arrival}
-              onChange={(e) =>
-                setFlightData((prev) => ({
-                  ...prev,
-                  arrival: e.target.value,
-                }))
-              }
+              onChange={(e) => setArrival(e.target.value)}
               required
             />
           </div>
@@ -191,12 +126,7 @@ function FlightBooking() {
             type="number"
             id="passengers"
             value={passengers}
-            onChange={(e) =>
-              setFlightData((prev) => ({
-                ...prev,
-                passengers: e.target.valueAsNumber,
-              }))
-            }
+            onChange={(e) => setPassengers(parseInt(e.target.value))}
             min="1"
             max="9"
             required
@@ -236,7 +166,7 @@ function FlightBooking() {
                     <p className="text-xl font-bold">${flight.price}</p>
                     <Button
                       className="mt-2 bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
-                      onClick={() => setSelectedFlight(flight)}
+                      onClick={() => handleFlightSelect(flight)}
                     >
                       {selectedFlight?.id === flight.id ? 'Selected' : 'Select'}
                     </Button>
