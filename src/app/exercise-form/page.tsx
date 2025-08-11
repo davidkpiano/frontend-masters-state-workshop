@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -13,9 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Combobox } from '@/components/combobox';
 import { locations } from '@/app/locations';
-import { FormState, submitTravelData } from './actions';
+import { submitTravelDataBasic, type TravelData } from './actions';
 import { CheckCircle } from 'lucide-react';
-import { useState } from 'react';
 
 const seatPreferences = [
   { value: 'window', label: 'Window' },
@@ -23,25 +23,76 @@ const seatPreferences = [
   { value: 'middle', label: 'Middle' },
 ];
 
-const initialState: FormState = {
-  status: 'idle',
-  errors: {},
-  data: null,
+type TravelFormData = {
+  firstName: string;
+  lastName: string;
+  birthdate: string;
+  passport: string;
+  originCity: string;
+  seatPreference: string;
 };
 
 export default function TravelFormPage() {
-  const [state, submitAction, isPending] = React.useActionState(
-    submitTravelData,
-    initialState
-  );
+  // Form data state
+  const [formData, setFormData] = useState<TravelFormData>({
+    firstName: '',
+    lastName: '',
+    birthdate: '',
+    passport: '',
+    originCity: '',
+    seatPreference: '',
+  });
 
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [successData, setSuccessData] = useState<TravelData | null>(null);
 
-  const isSuccess = state.status === 'success';
-  const errors = state.errors;
-  const successData = state.data;
+  const updateFormField = (field: keyof TravelFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Call simplified server action directly with form data
+      const result = await submitTravelDataBasic(formData);
+
+      if (result.status === 'success') {
+        setIsSuccess(true);
+        setSuccessData(result.data);
+      } else if (result.status === 'error') {
+        setErrors(result.errors);
+      }
+    } catch {
+      setErrors({ general: 'An unexpected error occurred. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Reset form
+  const handleReset = () => {
+    setFormData({
+      firstName: '',
+      lastName: '',
+      birthdate: '',
+      passport: '',
+      originCity: '',
+      seatPreference: '',
+    });
+    setIsSuccess(false);
+    setSuccessData(null);
+    setErrors({});
+  };
 
   // Success screen
   if (isSuccess && successData) {
@@ -114,7 +165,7 @@ export default function TravelFormPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={submitAction} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name *</Label>
@@ -122,20 +173,11 @@ export default function TravelFormPage() {
                   id="firstName"
                   name="firstName"
                   type="text"
+                  value={formData.firstName}
+                  onChange={(e) => updateFormField('firstName', e.target.value)}
                   placeholder="Enter your first name"
                   aria-invalid={errors.firstName ? 'true' : 'false'}
-                  onBlur={(ev) => {
-                    const value = ev.target.value;
-
-                    if (value.length < 3) {
-                      setValidationErrors((prev) => ({
-                        ...prev,
-                        firstName:
-                          'First name must be at least 3 characters long',
-                      }));
-                    }
-                  }}
-                  disabled={isPending}
+                  disabled={isSubmitting}
                 />
                 {errors.firstName && (
                   <p className="text-sm text-red-600 dark:text-red-400">
@@ -150,9 +192,11 @@ export default function TravelFormPage() {
                   id="lastName"
                   name="lastName"
                   type="text"
+                  value={formData.lastName}
+                  onChange={(e) => updateFormField('lastName', e.target.value)}
                   placeholder="Enter your last name"
                   aria-invalid={errors.lastName ? 'true' : 'false'}
-                  disabled={isPending}
+                  disabled={isSubmitting}
                 />
                 {errors.lastName && (
                   <p className="text-sm text-red-600 dark:text-red-400">
@@ -168,8 +212,10 @@ export default function TravelFormPage() {
                 id="birthdate"
                 name="birthdate"
                 type="date"
+                value={formData.birthdate}
+                onChange={(e) => updateFormField('birthdate', e.target.value)}
                 aria-invalid={errors.birthdate ? 'true' : 'false'}
-                disabled={isPending}
+                disabled={isSubmitting}
               />
               {errors.birthdate && (
                 <p className="text-sm text-red-600 dark:text-red-400">
@@ -184,9 +230,11 @@ export default function TravelFormPage() {
                 id="passport"
                 name="passport"
                 type="text"
+                value={formData.passport}
+                onChange={(e) => updateFormField('passport', e.target.value)}
                 placeholder="Enter your passport number"
                 aria-invalid={errors.passport ? 'true' : 'false'}
-                disabled={isPending}
+                disabled={isSubmitting}
               />
               {errors.passport && (
                 <p className="text-sm text-red-600 dark:text-red-400">
@@ -199,6 +247,10 @@ export default function TravelFormPage() {
               <Label htmlFor="originCity">Origin City *</Label>
               <Combobox
                 options={locations}
+                value={formData.originCity}
+                onChange={(value: string) =>
+                  updateFormField('originCity', value)
+                }
                 name="originCity"
                 placeholder="Select your departure city"
               />
@@ -213,6 +265,10 @@ export default function TravelFormPage() {
               <Label htmlFor="seatPreference">Seat Preference *</Label>
               <Combobox
                 options={seatPreferences}
+                value={formData.seatPreference}
+                onChange={(value: string) =>
+                  updateFormField('seatPreference', value)
+                }
                 name="seatPreference"
                 placeholder="Select your seat preference"
               />
@@ -231,8 +287,8 @@ export default function TravelFormPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? (
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
                 <>
                   <svg
                     className="animate-spin -ml-1 mr-3 h-4 w-4"
