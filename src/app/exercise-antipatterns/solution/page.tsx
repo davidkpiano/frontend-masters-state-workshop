@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 // Example 1: Filtered Destinations
-// Problem: Storing filtered destinations in state when they can be derived from the destinations list and filter criteria
 function FilteredDestinations() {
   const [destinations] = useState([
     { id: 1, name: 'Paris', country: 'France', rating: 4.5 },
@@ -23,25 +22,15 @@ function FilteredDestinations() {
     { id: 3, name: 'New York', country: 'USA', rating: 4.3 },
   ]);
   const [filterRating, setFilterRating] = useState(4.5);
-  const [filteredDestinations, setFilteredDestinations] = useState<
-    typeof destinations
-  >([]);
 
-  // This effect is unnecessary - we can derive filtered destinations
-  useEffect(() => {
-    setFilteredDestinations(
-      destinations.filter((dest) => dest.rating >= filterRating)
-    );
-  }, [destinations, filterRating]);
+  const filteredDestinations = destinations.filter(
+    (dest) => dest.rating >= filterRating
+  );
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Filtered Destinations</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing filtered destinations in state when they can be
-          derived from the destinations list and filter criteria
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
@@ -76,28 +65,19 @@ function FilteredDestinations() {
 }
 
 // Example 2: Trip Summary
-// Problem: Storing total cost in state when it can be derived from trip items
 function TripSummary() {
   const [tripItems] = useState([
     { id: 1, name: 'Flight', cost: 500 },
     { id: 2, name: 'Hotel', cost: 300 },
     { id: 3, name: 'Activities', cost: 200 },
   ]);
-  const [totalCost, setTotalCost] = useState(0);
 
-  // This effect is unnecessary - we can derive total cost
-  useEffect(() => {
-    setTotalCost(tripItems.reduce((sum, item) => sum + item.cost, 0));
-  }, [tripItems]);
+  const totalCost = tripItems.reduce((sum, item) => sum + item.cost, 0);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Trip Summary</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing total cost in state when it can be derived from
-          trip items
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -122,29 +102,20 @@ function TripSummary() {
 }
 
 // Example 3: Available Dates
-// Problem: Storing available dates in state when they can be derived from booked dates
 function AvailableDates() {
   const [bookedDates] = useState(['2024-06-01', '2024-06-02', '2024-06-03']);
-  const [availableDates, setAvailableDates] = useState<string[]>([]);
 
-  // This effect is unnecessary - we can derive available dates
-  useEffect(() => {
-    const allDates = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date('2024-06-01');
-      date.setDate(date.getDate() + i);
-      return date.toISOString().split('T')[0];
-    });
-    setAvailableDates(allDates.filter((date) => !bookedDates.includes(date)));
-  }, [bookedDates]);
+  const allDates = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date('2024-06-01');
+    date.setDate(date.getDate() + i);
+    return date.toISOString().split('T')[0];
+  });
+  const availableDates = allDates.filter((date) => !bookedDates.includes(date));
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Available Dates</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing available dates in state when they can be derived
-          from booked dates
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-48 overflow-y-auto">
@@ -169,7 +140,6 @@ function AvailableDates() {
 }
 
 // Example 4: Trip Status
-// Problem: Storing trip status in state when it can be derived from trip details
 function TripStatus() {
   const [trip] = useState({
     startDate: '2024-06-01',
@@ -179,7 +149,6 @@ function TripStatus() {
   });
   const [status, setStatus] = useState('');
 
-  // This effect is unnecessary - we can derive status
   useEffect(() => {
     const today = new Date();
     const start = new Date(trip.startDate);
@@ -212,10 +181,6 @@ function TripStatus() {
     <Card>
       <CardHeader>
         <CardTitle>Trip Status</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing trip status in state when it can be derived from
-          trip details
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between">
@@ -230,7 +195,6 @@ function TripStatus() {
 }
 
 // Example 5: Search Results
-// Problem: Storing sorted results in state when they can be derived from search results and sort criteria
 function SearchResults() {
   const [searchResults] = useState([
     { id: 1, name: 'Beach Resort', price: 200, rating: 4.5 },
@@ -240,7 +204,6 @@ function SearchResults() {
   const [sortBy, setSortBy] = useState('price');
   const [sortedResults, setSortedResults] = useState<typeof searchResults>([]);
 
-  // This effect is unnecessary - we can derive sorted results
   useEffect(() => {
     const sorted = [...searchResults].sort((a, b) => {
       if (sortBy === 'price') return a.price - b.price;
@@ -253,10 +216,6 @@ function SearchResults() {
     <Card>
       <CardHeader>
         <CardTitle>Search Results</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing sorted results in state when they can be derived
-          from search results and sort criteria
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
@@ -297,40 +256,40 @@ function SearchResults() {
 }
 
 // Example 6: Booking Timer
-// Problem: Using useState for timer ID when useRef should be used (doesn't need re-renders)
 function BookingTimer() {
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
-  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null); // ❌ Should use useRef
+  const [timeLeft, setTimeLeft] = useState(300);
+  // const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
+  const timerIdRef = useRef<NodeJS.Timeout | null>(null);
 
   const startTimer = () => {
-    if (timerId) clearInterval(timerId);
+    if (timerIdRef.current) clearInterval(timerIdRef.current);
 
     const id = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(id);
-          setTimerId(null); // ❌ Unnecessary re-render
+          timerIdRef.current = null;
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    setTimerId(id); // ❌ Unnecessary re-render
+    timerIdRef.current = id;
   };
 
   const stopTimer = () => {
-    if (timerId) {
-      clearInterval(timerId);
-      setTimerId(null); // ❌ Unnecessary re-render
+    if (timerIdRef.current) {
+      clearInterval(timerIdRef.current);
+      timerIdRef.current = null;
     }
   };
 
   useEffect(() => {
     return () => {
-      if (timerId) clearInterval(timerId);
+      if (timerIdRef.current) clearInterval(timerIdRef.current);
     };
-  }, [timerId]); // ❌ Effect runs every time timerId changes
+  }, []);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -339,10 +298,6 @@ function BookingTimer() {
     <Card>
       <CardHeader>
         <CardTitle>Booking Timer</CardTitle>
-        <CardDescription>
-          ❌ Problem: Using useState for timer ID when useRef should be used
-          (doesn&apos;t need re-renders)
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center">
@@ -370,7 +325,6 @@ function BookingTimer() {
 }
 
 // Example 7: Scroll Position Tracker
-// Problem: Using useState for scroll position when useRef should be used (tracking only)
 function HotelGallery() {
   const [images] = useState([
     'hotel-lobby.jpg',
@@ -378,17 +332,17 @@ function HotelGallery() {
     'hotel-pool.jpg',
     'hotel-restaurant.jpg',
   ]);
-  const [lastScrollPosition, setLastScrollPosition] = useState(0); // ❌ Should use useRef
+  // const [lastScrollPosition, setLastScrollPosition] = useState(0);
+  const lastScrollPositionRef = useRef<number>(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentPosition = window.scrollY;
 
-      // We only need this for internal logic, not for rendering
-      setLastScrollPosition(currentPosition); // ❌ Causes unnecessary re-render
+      // setLastScrollPosition(currentPosition);
+      lastScrollPositionRef.current = currentPosition;
 
-      // Some scroll-based logic here...
-      if (currentPosition > lastScrollPosition) {
+      if (currentPosition > lastScrollPositionRef.current) {
         console.log('Scrolling down');
       } else {
         console.log('Scrolling up');
@@ -397,7 +351,7 @@ function HotelGallery() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollPosition]); // ❌ Effect re-runs on every scroll
+  }, []);
 
   return (
     <Card>
@@ -420,7 +374,7 @@ function HotelGallery() {
           ))}
         </div>
         <div className="mt-4 text-xs text-muted-foreground">
-          Debug: Last scroll position: {lastScrollPosition}px
+          Debug: Last scroll position: {lastScrollPositionRef.current}px
         </div>
       </CardContent>
     </Card>
@@ -428,14 +382,13 @@ function HotelGallery() {
 }
 
 // Example 8: Search Analytics
-// Problem: Using useState for tracking data when useRef should be used (analytics only)
 function FlightSearch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<
     Array<{ id: number; flight: string; price: number }>
   >([]);
-  const [searchCount, setSearchCount] = useState(0); // ❌ Should use useRef
-  const [lastSearchTime, setLastSearchTime] = useState<number | null>(null); // ❌ Should use useRef
+  const [searchCount, setSearchCount] = useState(0);
+  const [lastSearchTime, setLastSearchTime] = useState<number | null>(null);
 
   const handleSearch = async () => {
     const now = Date.now();
@@ -462,10 +415,6 @@ function FlightSearch() {
     <Card>
       <CardHeader>
         <CardTitle>Flight Search</CardTitle>
-        <CardDescription>
-          ❌ Problem: Using useState for tracking data when useRef should be
-          used (analytics only)
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
@@ -502,7 +451,6 @@ function FlightSearch() {
 }
 
 // Example 9: Hotel Selection
-// Problem: Storing entire selected hotel object instead of just the hotel ID
 function HotelSelection() {
   const [hotels] = useState([
     {
@@ -527,22 +475,18 @@ function HotelSelection() {
       amenities: ['WiFi', 'Pool', 'Beach Access'],
     },
   ]);
-  const [selectedHotel, setSelectedHotel] = useState<(typeof hotels)[0] | null>(
-    null
-  ); // ❌ Storing entire object
+  const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
 
-  const handleHotelSelect = (hotel: (typeof hotels)[0]) => {
-    setSelectedHotel(hotel); // ❌ Storing the entire hotel object instead of just the ID!
+  const handleHotelSelect = (hotelId: string) => {
+    setSelectedHotelId(hotelId);
   };
+
+  const selectedHotel = hotels.find((hotel) => hotel.id === selectedHotelId);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Hotel Selection</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing entire selected hotel object instead of just the
-          hotel ID
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -554,7 +498,7 @@ function HotelSelection() {
                   ? 'border-primary bg-primary/5'
                   : 'hover:bg-accent'
               }`}
-              onClick={() => handleHotelSelect(hotel)}
+              onClick={() => handleHotelSelect(hotel.id)}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -604,7 +548,6 @@ function HotelSelection() {
 }
 
 // Example 10: User Profile Data
-// Problem: Storing user data in component state when it's already available from props/context
 function TravelPreferences() {
   const [userProfile] = useState({
     id: 'user123',
@@ -617,28 +560,10 @@ function TravelPreferences() {
     },
   });
 
-  // ❌ Storing duplicate user data that's already available
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [userBudget, setUserBudget] = useState('');
-  const [userTravelStyle, setUserTravelStyle] = useState('');
-
-  // ❌ These effects are unnecessary - we already have this data!
-  useEffect(() => {
-    setUserName(userProfile.name); // ❌ Redundant state
-    setUserEmail(userProfile.email); // ❌ Redundant state
-    setUserBudget(userProfile.preferences.budget); // ❌ Redundant state
-    setUserTravelStyle(userProfile.preferences.travelStyle); // ❌ Redundant state
-  }, [userProfile]);
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Travel Preferences</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing user data in component state when it&apos;s
-          already available from props/context
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -668,16 +593,16 @@ function TravelPreferences() {
             </Label>
             <div className="mt-1 space-y-1 text-sm">
               <p>
-                <strong>Name:</strong> {userName}
+                <strong>Name:</strong> {userProfile.name}
               </p>
               <p>
-                <strong>Email:</strong> {userEmail}
+                <strong>Email:</strong> {userProfile.email}
               </p>
               <p>
-                <strong>Budget:</strong> {userBudget}
+                <strong>Budget:</strong> {userProfile.preferences.budget}
               </p>
               <p>
-                <strong>Style:</strong> {userTravelStyle}
+                <strong>Style:</strong> {userProfile.preferences.travelStyle}
               </p>
             </div>
           </div>
@@ -697,7 +622,6 @@ function TravelPreferences() {
 }
 
 // Example 11: Booking Summary
-// Problem: Storing both raw booking data and formatted display data
 function BookingSummary() {
   const [bookingData] = useState({
     flightId: 'FL123',
@@ -710,7 +634,6 @@ function BookingSummary() {
     taxes: 89,
   });
 
-  // ❌ Storing formatted versions when they can be derived
   const [formattedDepartureDate, setFormattedDepartureDate] = useState('');
   const [formattedReturnDate, setFormattedReturnDate] = useState('');
   const [tripDuration, setTripDuration] = useState('');
@@ -718,7 +641,6 @@ function BookingSummary() {
   const [totalHotelCost, setTotalHotelCost] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
 
-  // ❌ All these effects are unnecessary - we can derive this data!
   useEffect(() => {
     const depDate = new Date(bookingData.departureDate);
     const retDate = new Date(bookingData.returnDate);
@@ -747,10 +669,6 @@ function BookingSummary() {
     <Card>
       <CardHeader>
         <CardTitle>Booking Summary</CardTitle>
-        <CardDescription>
-          ❌ Problem: Storing both raw booking data and formatted display data
-          (can be derived)
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -799,30 +717,17 @@ function BookingSummary() {
   );
 }
 
-export default function Exercise0() {
+export default function Page() {
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
-          Exercise 0: State Management Anti-patterns
+          State Management Anti-patterns
         </h1>
-        <p className="text-muted-foreground">
-          Learn to identify and fix common React state management mistakes in
-          travel booking applications.
-        </p>
       </div>
 
       <div className="space-y-8">
         <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            Part 1: Unnecessary State (Derived State)
-            <Badge variant="destructive">Anti-pattern</Badge>
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Each component below uses useState when the state could be derived
-            instead. Try to refactor them to remove unnecessary state.
-          </p>
-
           <div className="grid gap-6 md:grid-cols-2">
             <FilteredDestinations />
             <TripSummary />
@@ -837,16 +742,6 @@ export default function Exercise0() {
         <Separator className="my-8" />
 
         <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            Part 2: useState vs useRef
-            <Badge variant="destructive">Anti-pattern</Badge>
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            The components below use useState when useRef would be more
-            appropriate. useRef should be used when you need to store mutable
-            values that don&apos;t require re-renders when they change.
-          </p>
-
           <div className="grid gap-6 md:grid-cols-2">
             <BookingTimer />
             <HotelGallery />
@@ -859,17 +754,6 @@ export default function Exercise0() {
         <Separator className="my-8" />
 
         <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            Part 3: Redundant State
-            <Badge variant="destructive">Anti-pattern</Badge>
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            These components store redundant data - either entire objects when
-            only IDs are needed, or duplicate data that&apos;s already available
-            elsewhere. This leads to synchronization issues and unnecessary
-            complexity.
-          </p>
-
           <div className="grid gap-6 md:grid-cols-2">
             <HotelSelection />
             <TravelPreferences />
