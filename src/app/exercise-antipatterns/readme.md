@@ -82,6 +82,7 @@ function Timer() {
   };
 
   useEffect(() => {
+    startTimer();
     return () => timerId && clearInterval(timerId);
   }, [timerId]); // ❌ Effect runs every time timerId changes
 
@@ -104,6 +105,7 @@ function Timer() {
   };
 
   useEffect(() => {
+    startTimer();
     return () => timerIdRef.current && clearInterval(timerIdRef.current);
   }, []); // ✅ Effect runs only once
 
